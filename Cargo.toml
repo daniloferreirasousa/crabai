@@ -21,8 +21,10 @@ depends = "$auto"
 section = "utility"
 priority = "optional"
 assets = [
-    # Copia o executável para a pasta de binários do Linux
+    # Copia o executável
     ["target/release/rustops-gui", "usr/bin/", "755"],
-    # Copia o seu ícone para o sistema usar nos atalhos
+    # Copia o ícone
     ["icone.png", "usr/share/pixmaps/rustops.png", "644"],
+    # NOVO: Copia o atalho para o menu de aplicativos do Linux
+    ["rustops-gui.desktop", "usr/share/applications/", "644"],
 ]

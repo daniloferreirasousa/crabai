@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=1.0
+Name=RustOps
+Comment=Assistente de IA Local focado em Rust
+Exec=rustops-gui
+Icon=rustops
+Terminal=false
+Type=Application
+Categories=Utility;Development;
