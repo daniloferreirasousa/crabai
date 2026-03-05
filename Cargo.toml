@@ -1,0 +1,28 @@
+[package]
+name = "rustops-gui"
+version = "0.1.0"
+edition = "2024"
+authors = ["Danilo Ferreira Sousa <daniloasf@outlook.com>"]
+description = "Assistente de IA local focado em Engenharia e Segurança Ofensiva e Defensiva em Rust."
+
+[dependencies]
+eframe = "0.22" # GUI framework com egui
+reqwest = { version = "0.11", default-features = false, features = ["blocking", "json", "rustls-tls"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+image = "0.24"
+
+[package.metadata.deb]
+maintainer = "Danilo Ferreira Sousa <daniloasf@outlook.com>"
+copyright = "2026, Danilo Ferreira"
+license-file = []
+extended-description = "Interface nativa focada em Rust para modelos de IA locais."
+depends = "$auto"
+section = "utility"
+priority = "optional"
+assets = [
+    # Copia o executável para a pasta de binários do Linux
+    ["target/release/rustops-gui", "usr/bin/", "755"],
+    # Copia o seu ícone para o sistema usar nos atalhos
+    ["icone.png", "usr/share/pixmaps/rustops.png", "644"],
+]
