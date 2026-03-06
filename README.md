@@ -84,3 +84,12 @@ O executável otimizado estará em target/release/rustops-gui.exe. O terminal de
 - [ ] **Renderização de Markdown**: Implementar um parser rico na interface para exibir formatações (negrito, itálico) e blocos de código com syntax highlighting nativo.
 
 - [ ] **Integração de Ícone no .exe (Windows)**: Utilizar build.rs e winres para embutir o ícone no binário do Windows Explorer.
+
+
+### ☕ Apoie o Projeto
+
+Se curtiu o projeto, me pague um café! Aponte a câmera do seu celular para o QR Code abaixo ou use a chave PIX:
+
+<img src="assets/pix.png" alt="QR Code PIX" width="200">
+
+**Chave PIX (Copia e Cola):** ```00020126580014BR.GOV.BCB.PIX013693cc5dfd-0c3a-4e80-b087-4ac00a96b62e5204000053039865802BR5925DANILO DE ANDRADE FERREIR6007RESENDE62070503***63048F81```
