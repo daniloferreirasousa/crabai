@@ -37,7 +37,7 @@ fn main() -> eframe::Result<()> {
     options.icon_data = Some(carregar_icone());
 
     eframe::run_native(
-        "RustOps GUI",
+        "RustOps - Ferramenta de IA Red Team",
         options,
         Box::new(|_cc| Box::new(RustOpsApp::new())),
     )

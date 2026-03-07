@@ -1,10 +1,10 @@
 [package]
 name = "rustops-gui"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2024"
 license = "MIT"
 authors = ["Danilo Ferreira Sousa"]
-description = "Assistente de IA local focado em Engenharia e Segurança Ofensiva e Defensiva em Rust."
+description = "Assistente de IA local focado em Engenharia e Segurança Ofensiva e Defensiva em Rust, uso estritamente para fins educacionais."
 
 [dependencies]
 eframe = "0.22" # GUI framework com egui
@@ -12,6 +12,7 @@ reqwest = { version = "0.11", default-features = false, features = ["blocking", 
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 image = "0.24"
+webbrowser = "0.8"
 
 [package.metadata.deb]
 maintainer = "Danilo Ferreira Sousa <daniloasf@outlook.com>"

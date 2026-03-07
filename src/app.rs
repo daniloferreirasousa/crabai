@@ -22,6 +22,10 @@ pub struct RustOpsApp {
     startup_status_text: String,
 
     pub aceitou_termos: bool,
+
+    // Variaveis para o atualizador:
+    pub receptor_update: Option<Receiver<String>>,
+    pub versao_disponivel: Option<String>,
 }
 
 // =========================================================
@@ -29,7 +33,11 @@ pub struct RustOpsApp {
 // =========================================================
 impl RustOpsApp {
     pub fn new() -> Self {
+        // Canal do Ollama
         let (tx, rx) = channel::<String>();
+
+        // Canal do Atualizador:
+        let (tx_update, rx_update) = channel::<String>();
 
         // Thread rodando em segundo plano para não travar a interface
         thread::spawn(move || {
@@ -55,6 +63,28 @@ impl RustOpsApp {
             let _ = tx.send("CONCLUIDO".to_string());
         });
 
+        // Thread rodando em segundo plano (Verificador do GitHub)
+        let versao_atual = env!("CARGO_PKG_VERSION").to_string();
+        thread::spawn(move ||{
+            let url = "https://api.github.com/repos/daniloferreirasousa/rustops-gui/releases/latest";
+
+            let client = reqwest::blocking::Client::builder()
+                .user_agent("RustOps-App")
+                .build()
+                .unwrap();
+
+            if let Ok(resposta) = client.get(url).send() {
+                if let Ok(json) = resposta.json::<serde_json::Value>() {
+                    if let Some(tag) = json["tag_name"].as_str() {
+                        let tag_limpa = tag.trim_start_matches('v');
+                        if tag_limpa != versao_atual {
+                            let _ = tx_update.send(tag.to_string());
+                        }
+                    }
+                }
+            }
+        });
+
         Self {
             user_input: String::new(),
             db: AppDatabase::carregar(),
@@ -67,6 +97,9 @@ impl RustOpsApp {
             startup_receiver: Some(rx),
             startup_status_text: "Iniciando RustOps...".to_string(),
             aceitou_termos: false,
+
+            receptor_update: Some(rx_update),
+            versao_disponivel: None,
         }
     }
 }
@@ -105,6 +138,41 @@ impl RustOpsApp {
             return true;
         }
         false
+    }
+
+
+    fn desenhar_alerta_atualizacao(&mut self, ctx: &egui::Context) {
+        // 1. Tenta ler a mensage da thread do Github
+        if let Some(rx) = &self.receptor_update {
+            if let Ok(nova_versao) = rx.try_recv() {
+                self.versao_disponivel = Some(nova_versao);
+                self.receptor_update = None; // Limpa o canal
+            }
+        }
+
+        // 2. Se tem versão nova, desenha uma barra superior de destaque
+        if let Some(versao) = &self.versao_disponivel {
+            egui::TopBottomPanel::top("painel_atualizacao").show(ctx, |ui| {
+                ui.add_space(5.0);
+                ui.horizontal(|ui| {
+                    ui.label(
+                        egui::RichText::new(format!("🚀 Nova versão do RustOps disponível ({})!", versao))
+                            .color(egui::Color32::YELLOW)
+                            .strong()
+                    );
+
+                    // Empurra o botão para a direita
+                    ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                       
+                       if ui.button("Baixar Atualização").clicked() {
+                            let url_release = "https://github.com/daniloferreirasousa/rustops-gui/releases/latest";
+                            let _ = webbrowser::open(url_release);
+                       }
+                    });
+                });
+                ui.add_space(5.0);
+            });
+        }
     }
 
     fn desenhar_tela_carregamento(&mut self, ctx: &egui::Context) -> bool {
@@ -344,12 +412,12 @@ impl eframe::App for RustOpsApp {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         
 
-        // 1. TELA DE CARREGAMENTO
-        // Se retornar true, significa que a tela de carregamento está ativa e
-        // as outras partes do app não devem ser desenhadas ainda.
+        // 1. TELAS DE BLOQUEIO (Loading e Termos)
         if self.desenhar_tela_carregamento(ctx) { return; }
-
         if self.termos_de_uso(ctx) { return; }
+
+        // 1.5 ALERTAS
+        self.desenhar_alerta_atualizacao(ctx);
 
         // 2. PROCESSAMENTO EM SEGUNDO PLANO
         self.processar_mensagens_ia(ctx);
