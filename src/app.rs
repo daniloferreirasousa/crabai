@@ -26,6 +26,9 @@ pub struct RustOpsApp {
     // Variaveis para o atualizador:
     pub receptor_update: Option<Receiver<String>>,
     pub versao_disponivel: Option<String>,
+
+    // Contrle da janela de apoio
+    pub mostrar_janela_apoio: bool,
 }
 
 // =========================================================
@@ -100,6 +103,8 @@ impl RustOpsApp {
 
             receptor_update: Some(rx_update),
             versao_disponivel: None,
+
+            mostrar_janela_apoio: false,
         }
     }
 }
@@ -269,6 +274,16 @@ impl RustOpsApp {
                         self.db.salvar();
                     }
                 });
+
+
+                ui.with_layout(egui::Layout::bottom_up(egui::Align::Center), |ui| {
+                    ui.add_space(10.0);
+                    if ui.button("☕ Apoie o Projeto").clicked() {
+                        self.mostrar_janela_apoio = true;
+                    }
+                    ui.add_space(10.0);
+                    ui.separator();
+                });
             });
     }
 
@@ -403,6 +418,40 @@ impl RustOpsApp {
                 });
         });
     }
+
+
+    fn desenhar_janela_apoio(&mut self, ctx: &egui::Context) {
+        // Se for false, nem desenha nada
+        if !self.mostrar_janela_apoio {
+            return;
+        }
+
+        let mut aberta = self.mostrar_janela_apoio;
+
+        egui::Window::new("☕ Apoie o Projeto")
+            .open(&mut aberta) // Adiciona um "X" para fechar a janela
+            .collapsible(false)
+            .resizable(false)
+            .anchor(egui::Align2::CENTER_CENTER, [0.0, 0.0]) // Abre bem no meio da tela
+            .show(ctx, |ui|{
+                ui.vertical_centered(|ui| {
+                    ui.add_space(10.0);
+                    ui.label("Gostou do RustOps? Ele é gratuito e open-source!");
+                    ui.label("Considere me pagar um café para ajudar a manter o projeto.");
+                    ui.add_space(20.0);
+
+                    let chave_pix = "00020126580014BR.GOV.BCB.PIX013693cc5dfd-0c3a-4e80-b087-4ac00a96b62e5204000053039865802BR5925DANILO DE ANDRADE FERREIR6007RESENDE62070503***63048F81";
+
+                    if ui.button("Copiar Chave PIX").clicked() {
+                        ui.output_mut(|o| o.copied_text = chave_pix.to_string());
+                    }
+                    ui.add_space(10.0);
+                    ui.label(egui::RichText::new("Danilo Ferreira Sousa - Resende/RJ").small().color(egui::Color32::GRAY));
+                    ui.add_space(10.0);
+                });
+            });
+            self.mostrar_janela_apoio = aberta;
+    }
 }
 
 // =========================================================
@@ -426,5 +475,8 @@ impl eframe::App for RustOpsApp {
         self.desenhar_painel_lateral(ctx);
         self.desenhar_rodape(ctx);
         self.desenhar_painel_central(ctx);
+
+        // 4. JANELAS FLUTUANTES (Modais)
+        self.desenhar_janela_apoio(ctx);
     }
 }
