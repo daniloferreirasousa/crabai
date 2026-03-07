@@ -1,6 +1,7 @@
 use eframe::egui;
 use std::sync::mpsc::{channel, Receiver};
 use std::thread;
+use egui_commonmark::{CommonMarkCache, CommonMarkViewer};
 
 use crate::storage::{AppDatabase, ChatMessage};
 use crate::ollama;
@@ -29,6 +30,7 @@ pub struct RustOpsApp {
 
     // Contrle da janela de apoio
     pub mostrar_janela_apoio: bool,
+    pub markdown_cache: CommonMarkCache,
 }
 
 // =========================================================
@@ -105,6 +107,8 @@ impl RustOpsApp {
             versao_disponivel: None,
 
             mostrar_janela_apoio: false,
+
+            markdown_cache: CommonMarkCache::default(),
         }
     }
 }
@@ -384,27 +388,62 @@ impl RustOpsApp {
                 .auto_shrink([false; 2])
                 .stick_to_bottom(true)
                 .show(ui, |ui| {
-                    for msg in &self.db.get_sessao_ativa_mut().mensagens {
+                    //  for msg in &self.db.get_sessao_ativa_mut().mensagens {
+                    //     if msg.role == "system" { continue; }
+
+                    //     let mut texto_exibicao = if msg.role == "user" {
+                    //         format!("Você: {}", msg.content)
+                    //     } else {
+                    //         format!("RustOps: {}", msg.content)
+                    //     };
+
+                    //     let cor_texto = if msg.role == "user" {
+                    //         egui::Color32::LIGHT_BLUE
+                    //     } else {
+                    //         egui::Color32::LIGHT_GREEN
+                    //     };
+
+                    //     ui.add(
+                    //         egui::TextEdit::multiline(&mut texto_exibicao)
+                    //             .text_color(cor_texto)
+                    //             .frame(false)
+                    //             .desired_width(ui.available_width())
+                    //     );
+                    //     ui.add_space(5.0);
+                    // }
+
+                    // ID da sessão atual
+                    let id_sessao = self.db.sessao_ativa_id;
+
+                    // Iter().enumarate para ter um indice (0,1,2,...) para cada mensagem
+                    for (indice, msg) in self.db.get_sessao_ativa_mut().mensagens.iter().enumerate() {
                         if msg.role == "system" { continue; }
 
-                        let mut texto_exibicao = if msg.role == "user" {
-                            format!("Você: {}", msg.content)
+                        if msg.role == "user" {
+                            // Mensagem do usuário (texto normal azulzinho)
+                            ui.label(
+                                egui::RichText::new(format!("Você: {}", msg.content))
+                                    .color(egui::Color32::LIGHT_BLUE)
+                            );
                         } else {
-                            format!("RustOps: {}", msg.content)
-                        };
+                            // Mensagem da IA
+                            ui.label(
+                                egui::RichText::new("RustOps:")
+                                    .color(egui::Color32::LIGHT_GREEN)
+                            );
 
-                        let cor_texto = if msg.role == "user" {
-                            egui::Color32::LIGHT_BLUE
-                        } else {
-                            egui::Color32::LIGHT_GREEN
-                        };
+                            // Criar um id único juntando o ID do chat + posição da mensagem
+                            let id_mensagem = format!("chat_{}_msg_{}", id_sessao, indice);
 
-                        ui.add(
-                            egui::TextEdit::multiline(&mut texto_exibicao)
-                                .text_color(cor_texto)
-                                .frame(false)
-                                .desired_width(ui.available_width())
-                        );
+                            ui.push_id(&id_mensagem, |ui| {
+                                CommonMarkViewer::new()
+                                    .show(ui, &mut self.markdown_cache, &msg.content);
+                            });
+                        }
+
+                        // Um espaço e uma linha para separar as mensagens de forma elegante
+                        ui.add_space(5.0);
+                        ui.separator();
                         ui.add_space(5.0);
                     }
 
@@ -412,7 +451,7 @@ impl RustOpsApp {
                         ui.add_space(10.0);
                         ui.horizontal(|ui| {
                             ui.spinner();
-                            ui.label(egui::RichText::new("RustOps está digitando...").color(egui::Color32::GRAY));
+                            ui.label(egui::RichText::new("RustOps está digitando...").color(egui::Color32::DARK_GRAY));
                         });
                     }
                 });
@@ -443,10 +482,10 @@ impl RustOpsApp {
                     let chave_pix = "00020126580014BR.GOV.BCB.PIX013693cc5dfd-0c3a-4e80-b087-4ac00a96b62e5204000053039865802BR5925DANILO DE ANDRADE FERREIR6007RESENDE62070503***63048F81";
 
                     if ui.button("Copiar Chave PIX").clicked() {
-                        ui.output_mut(|o| o.copied_text = chave_pix.to_string());
+                        ui.ctx().copy_text(chave_pix.to_string());
                     }
                     ui.add_space(10.0);
-                    ui.label(egui::RichText::new("Danilo Ferreira Sousa - Resende/RJ").small().color(egui::Color32::GRAY));
+                    ui.label(egui::RichText::new("Danilo Ferreira Sousa").small().color(egui::Color32::GRAY));
                     ui.add_space(10.0);
                 });
             });

@@ -11,10 +11,10 @@ mod storage;
 mod utils;
 
 use app::RustOpsApp;
-use eframe;
+use eframe::egui;
 
 // Função para carregar os pixels da imagem durante a compilação
-fn carregar_icone() -> eframe::IconData {
+fn carregar_icone() -> egui::IconData {
     let image_bytes = include_bytes!("../icone.png");
     let image = image::load_from_memory(image_bytes)
         .expect("Falha ao carregar o ícone. Verifique se icone.png está na raiz do projeto.")
@@ -23,7 +23,7 @@ fn carregar_icone() -> eframe::IconData {
     let (width, height) = image.dimensions();
     let rgba = image.into_raw();
     
-    eframe::IconData {
+    egui::IconData {
         rgba,
         width,
         height,
@@ -34,11 +34,13 @@ fn main() -> eframe::Result<()> {
     println!("=== INICIANDO INTERFACE GRÁFICA ===");
 
     let mut options = eframe::NativeOptions::default();
-    options.icon_data = Some(carregar_icone());
+
+    options.viewport = egui::ViewportBuilder::default()
+        .with_icon(carregar_icone());
 
     eframe::run_native(
         "RustOps - Ferramenta de IA Red Team",
         options,
-        Box::new(|_cc| Box::new(RustOpsApp::new())),
+        Box::new(|_cc| Ok(Box::new(RustOpsApp::new()))),
     )
 }
