@@ -97,7 +97,7 @@ O executável otimizado estará em **target/x86_64-pc-windows-gnu/release/rustop
 
 - [x] Renderização de Markdown: Implementar um parser rico na interface para exibir formatações (negrito, itálico) e blocos de código com syntax highlighting nativo.
 
-- [ ] Integração de Ícone no .exe (Windows): Utilizar build.rs e winres para embutir o ícone no binário do Windows Explorer.
+- [x] Integração de Ícone no .exe (Windows): Utilizar build.rs e winres para embutir o ícone no binário do Windows Explorer.
 
 ## 📄 Licença
 
