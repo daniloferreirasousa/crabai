@@ -20,6 +20,8 @@ pub struct RustOpsApp {
     is_initialized: bool,
     startup_receiver: Option<Receiver<String>>,
     startup_status_text: String,
+
+    pub aceitou_termos: bool,
 }
 
 // =========================================================
@@ -35,7 +37,7 @@ impl RustOpsApp {
             let _ = tx.send("Verificando motor de IA (Ollama)...".to_string());
             if !utils::is_ollama_installed() {
                 let _ = tx.send("Instalando Ollama... A janela de senha do sistema pode aparecer.".to_string());
-                let _ = utils::instalar_ollama(); // Usa a função multiplataforma que criamos
+                let _ = utils::instalar_ollama(); // Usa a função multiplataforma de instalação
             }
 
             // 2. Inicia o serviço
@@ -64,6 +66,7 @@ impl RustOpsApp {
             is_initialized: false,
             startup_receiver: Some(rx),
             startup_status_text: "Iniciando RustOps...".to_string(),
+            aceitou_termos: false,
         }
     }
 }
@@ -72,6 +75,38 @@ impl RustOpsApp {
 // MÉTODOS PRIVADOS DE DESENHO DA INTERFACE
 // =========================================================
 impl RustOpsApp {
+    fn termos_de_uso(&mut self, ctx: &egui::Context) -> bool {
+        if !self.aceitou_termos {
+            egui::CentralPanel::default().show(ctx, |ui| {
+                ui.vertical_centered(|ui| {
+                    ui.add_space(ui.available_height() / 3.0);
+
+                    ui.heading("⚠️ AVISO LEGAL E TERMOS DE USO");
+                    ui.add_space(20.0);
+
+                    ui.label("O RustOps é uma ferramenta local desenvolvida estritamente para fins educacionais");
+                    ui.label("e de pesquisa em Segurança da Informação (Red Teaming).");
+                    ui.add_space(10.0);
+
+                    ui.label("O desenvolvedor não se responsabilida por nenhum dano, uso indevido");
+                    ui.label("ou atividade ilegal realizada com o auxilio desta ferramenta.");
+                    ui.add_space(10.0);
+
+                    ui.label("Ao utilizar o RustOps, você concorda que todas as ações tomadas");
+                    ui.label("são de sua única e exclusiva responsabilidade.");
+                    ui.add_space(30.0);
+
+                    // Botão que destrava o aplicativo
+                    if ui.button("🚨 Eu li, compreendo e aceito os termos").clicked() {
+                        self.aceitou_termos = true;
+                    }
+                });
+            });
+            return true;
+        }
+        false
+    }
+
     fn desenhar_tela_carregamento(&mut self, ctx: &egui::Context) -> bool {
         // Se já carregou tudo, avisa o update() para desenhar o resto do app
         if self.is_initialized {
@@ -184,15 +219,24 @@ impl RustOpsApp {
                 {
                     let historico_completo = {
                         let sessao_atual = self.db.get_sessao_ativa_mut();
+                        
+                        // 1. Aiciona a mensagem do usuário
                         sessao_atual.mensagens.push(ChatMessage {
                             role: "user".to_string(),
                             content: self.user_input.clone(),
                         });
+
+                        // 2. Clona o Histórico aqui (Só vai até o "user")
+                        let historico_para_api = sessao_atual.mensagens.clone();
+
+                        // 3. Adiciona a mensagem vazia apenas para a Interface (UI) desenhar na tela
                         sessao_atual.mensagens.push(ChatMessage {
                             role: "assistant".to_string(),
                             content: "".to_string(),
                         });
-                        sessao_atual.mensagens.clone()
+
+                        // Retorna o histórico limpa para enviar para o Ollama
+                        historico_para_api
                     }; 
 
                     self.db.salvar();
@@ -212,10 +256,14 @@ impl RustOpsApp {
             // Assinatura
             ui.vertical_centered(|ui| {
                 ui.label(
-                    egui::RichText::new("Desenvolvido por Danilo Ferreira Sousa | Versão: 1.1 | Motor: Mistral")
+                    egui::RichText::new(format!("Desenvolvido por {}", env!("CARGO_PKG_AUTHORS")))
                     .small()
                     .color(egui::Color32::DARK_GRAY)
                 );
+                ui.label(egui::RichText::new(format!("RustOps v{}", env!("CARGO_PKG_VERSION")))
+                .small()
+                .color(egui::Color32::DARK_GRAY)
+            );
             });
             ui.add_space(10.0);
         });
@@ -295,12 +343,13 @@ impl RustOpsApp {
 impl eframe::App for RustOpsApp {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         
+
         // 1. TELA DE CARREGAMENTO
         // Se retornar true, significa que a tela de carregamento está ativa e
         // as outras partes do app não devem ser desenhadas ainda.
-        if self.desenhar_tela_carregamento(ctx) {
-            return;
-        }
+        if self.desenhar_tela_carregamento(ctx) { return; }
+
+        if self.termos_de_uso(ctx) { return; }
 
         // 2. PROCESSAMENTO EM SEGUNDO PLANO
         self.processar_mensagens_ia(ctx);

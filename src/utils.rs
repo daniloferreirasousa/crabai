@@ -109,7 +109,7 @@ pub fn setup_custom_model() {
 
     // Instrução base embutida no binário
     let modelfile_content = r#"
-        FROM mistral
+        FROM dolphin-llama3
 
         PARAMETER temperature 0.5
         PARAMETER num_predict 2048

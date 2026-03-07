@@ -7,7 +7,8 @@ use crate::storage::ChatMessage; // <--- Importa o modelo de dados
 // Envia todo o histórico para a API de chat do Ollama
 pub fn send_to_ollama_chat(history: Vec<ChatMessage>, tx: Sender<String>) {
     let client = Client::builder()
-        .timeout(std::time::Duration::from_secs(600))
+        .connect_timeout(std::time::Duration::from_secs(60))
+        .timeout(std::time::Duration::from_secs(1800))
         .build()
         .unwrap_or_else(|_| Client::new());
 
