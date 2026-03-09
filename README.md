@@ -10,7 +10,7 @@
 
 ### 🚀 O que há de novo na v0.1.4?
 
-* **Motor de IA Otimizado:** Implementação do modelo `nchapman/dolphin3.0-qwen2.5:3b`. Esta mudança garante um equilíbrio superior entre velocidade de resposta, menor consumo de RAM e alta capacidade de raciocínio lógico em Rust e cibersegurança.
+* **Motor de IA Avançado:** Migração para o modelo `dolphin3:8b` (baseado no Llama 3.1). Esta mudança traz um salto significativo na qualidade do raciocínio lógico, maior precisão técnica em código Rust e uma capacidade muito superior de lidar com contextos complexos de segurança ofensiva.
 * **Fluxo de Inicialização Robusto:** Tratamento de erros aprimorado na thread de setup, com logs detalhados e notificação clara de falhas na tela de carregamento.
 * **Arquitetura "Zero-Touch" Refinada:** Otimização na criação do `Modelfile` customizado, garantindo que o modelo `rustops` seja configurado de forma consistente em qualquer máquina.
 
@@ -69,7 +69,7 @@ cargo build --target x86_64-pc-windows-gnu --release
 
 - [x] Renderização de Markdown com syntax highlighting.
 
-- [x] Migração para Dolphin 3.0 (3B) para otimização de performance.
+- [x] Migração para Dolphin 3.0 Llama 3.1 (8B) para maior precisão lógica.
 
 ### 📄 Licença
 Este projeto está licenciado sob a GNU General Public License v3.0 (GPLv3). Software livre e de código aberto. Consulte o arquivo LICENSE para detalhes.
