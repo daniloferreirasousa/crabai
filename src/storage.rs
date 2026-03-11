@@ -1,5 +1,6 @@
 use serde::{Deserialize, Serialize};
 use std::fs;
+use std::sync::mpsc::Receiver;
 
 // Nome do arquivo onde todas as conversas ficarão salvas
 const ARQUIVO_DB: &str = "rustops_db.json";
@@ -12,15 +13,19 @@ pub struct ChatMessage{
 }
 
 // Representa uma aba de chat completa (preparando para múltiplos chats)
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Serialize, Deserialize)]
 pub struct ChatSession {
     pub id: usize,
     pub titulo: String,
     pub mensagens: Vec<ChatMessage>,
+    pub is_loading: bool,
+
+    #[serde(skip)]
+    pub receptor: Option<Receiver<String>>,
 }
 
 // Representa todo o "Banco de Dados" do aplicativo
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Serialize, Deserialize)]
 pub struct AppDatabase {
     pub sessoes: Vec<ChatSession>,
     pub sessao_ativa_id: usize, // Indica qual aba estamos lendo
@@ -58,6 +63,8 @@ impl AppDatabase {
             id: novo_id,
             titulo: format!("Nova Conversa {}", novo_id),
             mensagens: vec![instrucao_sistema],
+            is_loading: false,
+            receptor: None,
         };
 
         self.sessoes.push(nova_sessao);
@@ -110,6 +117,8 @@ impl AppDatabase {
             id: 1,
             titulo: "Chat Principal".to_string(),
             mensagens: vec![instrucao_sistema],
+            is_loading: false,
+            receptor: None,
         };
 
         AppDatabase {

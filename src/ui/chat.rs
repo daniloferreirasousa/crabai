@@ -1,4 +1,3 @@
-// Renderiza APENAS a área de mensagens e o input de texto
 use eframe::egui;
 use crate::app::RustOpsApp;
 use egui_commonmark::{CommonMarkViewer};
@@ -37,11 +36,12 @@ pub fn desenhar_painel_central(app: &mut RustOpsApp, ctx: &egui::Context) {
             .stick_to_bottom(true)
             .show(ui, |ui| {
                 
-                // ID da sessão atual
-                let id_sessao = app.db.sessao_ativa_id;
+                // Referência mutável da sessão ativa
+                let sessao_ativa = app.db.get_sessao_ativa_mut();
+                let id_sessao = sessao_ativa.id;
 
                 // Iter().enumarate para ter um indice (0,1,2,...) para cada mensagem
-                for (indice, msg) in app.db.get_sessao_ativa_mut().mensagens.iter().enumerate() {
+                for (indice, msg) in sessao_ativa.mensagens.iter().enumerate() {
                     if msg.role == "system" { continue; }
 
                     if msg.role == "user" {
@@ -66,13 +66,12 @@ pub fn desenhar_painel_central(app: &mut RustOpsApp, ctx: &egui::Context) {
                         });
                     }
 
-                    // Um espaço e uma linha para separar as mensagens de forma elegante
                     ui.add_space(5.0);
                     ui.separator();
                     ui.add_space(5.0);
                 }
 
-                if app.is_processing {
+                if app.db.get_sessao_ativa_mut().is_loading {
                     ui.add_space(10.0);
                     ui.horizontal(|ui| {
                         ui.spinner();

@@ -11,8 +11,6 @@ use crate::ui;
 pub struct RustOpsApp {
     pub user_input: String,
     pub db: AppDatabase,
-    pub receptor_de_texto: Option<Receiver<String>>,
-    pub is_processing: bool,
     
     // Controle de edição do título
     pub editando_titulo: bool,
@@ -108,8 +106,6 @@ impl RustOpsApp {
         Self {
             user_input: String::new(),
             db: AppDatabase::carregar(),
-            receptor_de_texto: None,
-            is_processing: false,
             editando_titulo: false,
             novo_titulo_temp: String::new(),
             is_initialized: false,
@@ -139,7 +135,7 @@ impl eframe::App for RustOpsApp {
         let (cpu, ram) = crate::system_stats::obter_dados_hardware(&mut self.sys);
         self.cpu_usage = cpu;
         self.ram_usage = ram;
-        
+
         // 1. TELAS DE BLOQUEIO (Loading e Termos)
         if ui::splash::desenhar_tela_carregamento(self, ctx) { return; }
         if ui::terms::termos_de_uso(self, ctx) { return; }

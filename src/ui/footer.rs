@@ -22,7 +22,7 @@ pub fn desenhar_rodape(app: &mut RustOpsApp, ctx: &egui::Context) {
                 .show(ui, |ui| {
                     let response = ui.add(
                         egui::TextEdit::multiline(&mut app.user_input)
-                            .hint_text("Digite sua mensagem aqui... (Shift + Enter para nova linha)")
+                            .hint_text("Insira um comando para o RustOps")
                             .desired_width(largura_disponivel)
                             .desired_rows(2)
                             .lock_focus(true)
@@ -37,43 +37,43 @@ pub fn desenhar_rodape(app: &mut RustOpsApp, ctx: &egui::Context) {
                 // Botão com tamanho fixo
                 let button = ui.add_sized([70.0, 35.0], egui::Button::new("Enviar"));
 
-                // 3. Processamento do Envio (seka por clique ou por teclado)
-                if (button.clicked() || app.requisitou_envio) && !app.user_input.trim().is_empty() && !app.is_processing {
-                    app.requisitou_envio = false; // Reset imediato da flag
-                
+                // 3. Processamento do Envio (seja por clique ou por teclado)
+                let sessao_ativa = app.db.get_sessao_ativa_mut();
 
-                // --- CÓDIGO DE ENVIO (OLLAMA) ---
-                let historico_completo = {
-                    let sessao_atual = app.db.get_sessao_ativa_mut();
-                    
+               if (button.clicked() || app.requisitou_envio) && !app.user_input.trim().is_empty() && !sessao_ativa.is_loading {
+                   let (historico, tx) = {
+                        sessao_ativa.is_loading = true;
+
                     // Adiciona mensagem do usuário
-                    sessao_atual.mensagens.push(ChatMessage {
+                    sessao_ativa.mensagens.push(ChatMessage {
                         role: "user".to_string(),
                         content: app.user_input.trim().to_string(),
                     });
 
-                    let historico_para_api = sessao_atual.mensagens.clone();
+                    let historico = sessao_ativa.mensagens.clone();
 
                     // Prepara o balão da resposta da IA
-                    sessao_atual.mensagens.push(ChatMessage {
+                    sessao_ativa.mensagens.push(ChatMessage {
                         role: "assistant".to_string(),
                         content: "".to_string(),
                     });
 
-                    historico_para_api
-                };
-                app.db.salvar();
-                app.user_input.clear();
-                app.is_processing = true;
+                    // Seta o receptor
+                    let (tx, rx) = channel();
+                    sessao_ativa.receptor = Some(rx);
 
-                let (tx, rx) = channel();
-                app.receptor_de_texto = Some(rx);
+                    (historico, tx)
+                   };
 
-                thread::spawn(move || {
-                    ollama::send_to_ollama_chat(historico_completo, tx);
-                });
-                // --- FIM DO CÓDIGO DE ENVIO ---
-            }
+                   // Finaliza as ações globais após o bloco
+                   app.requisitou_envio = false;
+                   app.db.salvar();
+                   app.user_input.clear();
+
+                   thread::spawn(move || {
+                        ollama::send_to_ollama_chat(historico, tx);
+                   });
+                }
         });
         ui.add_space(10.0);
         ui.separator();
