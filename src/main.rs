@@ -9,6 +9,7 @@ mod app;
 mod ollama;
 mod storage;
 mod utils;
+pub mod ui;
 
 use app::RustOpsApp;
 use eframe::egui;

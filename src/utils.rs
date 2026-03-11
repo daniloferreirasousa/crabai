@@ -116,16 +116,33 @@ pub fn setup_custom_model(tx: &Sender<String>) -> Result<(), String> {
         // 2. Pull do mode base
         let _= tx.send("Baixando pacotes de IA (~5GB)... Isso é feito apenas uma vez.".to_string());
 
-        let pull_status = Command::new("ollama")
+        let mut tentativas = 0;
+        let max_tentativas = 3;
+
+        while tentativas < max_tentativas {
+            let pull_status = Command::new("ollama")
             .args(&["pull", base_model])
             .stdout(Stdio::null())
             .stderr(Stdio::null())
-            .status()
-            .map_err(|e| format!("Falha ao incovar o comando pull: {}", e))?;
+            .status();
 
-        if !pull_status.success() {
-            return Err("Falha na conexão ou no download do motor de IA.".to_string());
+            if let Ok(status) = pull_status {
+                if status.success() {
+                    break;
+                }
+            }
+
+            tentativas += 1;
+            let _ = tx.send(format!("Tentativa {} de {} após falha na rede...", tentativas, max_tentativas));
+            thread::sleep(Duration::from_secs(5));
+
+            if tentativas == max_tentativas {
+                return Err("falha persistente na conexão. Tente rodar 'ollama pull dolphin3:8b' no terminal.".to_string());
+            }
+
+            
         }
+        
 
         // 3. Criação do modelo 'rustops'
         let _= tx.send("Configurando modelo RustOps...".to_string());
