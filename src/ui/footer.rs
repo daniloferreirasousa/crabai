@@ -80,6 +80,34 @@ pub fn desenhar_rodape(app: &mut RustOpsApp, ctx: &egui::Context) {
         ui.add_space(4.0);
 
         ui.horizontal(|ui| {
+            
+            let button_frame = egui::Frame::new()
+                .fill(egui::Color32::from_rgb(80, 180, 80))
+                .corner_radius(4.0)
+                .inner_margin(egui::Margin::symmetric(10, 5));
+
+            let response = button_frame.show(ui, |ui| {
+                ui.label(egui::RichText::new("☕ Apoie o Projeto")
+                    .color(egui::Color32::BLACK)
+                    .strong()
+                )
+            })
+            .response
+            .interact(egui::Sense::click());
+
+            if response.hovered() {
+                ui.ctx().set_cursor_icon(egui::CursorIcon::PointingHand);
+            }
+
+            if response.clicked() {
+                app.mostrar_janela_apoio = true;
+            }
+
+            ui.add_space(10.0);
+            ui.separator();
+            ui.add_space(10.0);
+
+
             // 1. Status de Hardware (Esquerda)
             ui.spacing_mut().item_spacing.x = 15.0; // Espaço entre os itens
 
@@ -125,7 +153,7 @@ pub fn desenhar_rodape(app: &mut RustOpsApp, ctx: &egui::Context) {
                 ui.label(
                     egui::RichText::new(format!("| {} |", env!("CARGO_PKG_AUTHORS")))
                     .small()
-                    .color(egui::Color32::DARK_GRAY)
+                    .color(egui::Color32::from_rgb(80,80,80))
                 );
             });
         });

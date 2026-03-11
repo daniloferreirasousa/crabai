@@ -28,15 +28,5 @@ pub fn desenhar_painel_lateral(app: &mut RustOpsApp, ctx: &egui::Context) {
                     app.db.salvar();
                 }
             });
-
-
-            ui.with_layout(egui::Layout::bottom_up(egui::Align::Center), |ui| {
-                ui.add_space(10.0);
-                if ui.button("☕ Apoie o Projeto").clicked() {
-                    app.mostrar_janela_apoio = true;
-                }
-                ui.add_space(10.0);
-                ui.separator();
-            });
         });
 }
