@@ -1,9 +1,25 @@
+#[cfg(target_os = "windows")]
+use std::os::windows::process::CommandExt;
+
+
+use sysinfo::{Disks};
 use reqwest::blocking::Client;
 use std::fs;
 use std::process::{Command, Stdio};
 use std::thread;
 use std::time::Duration;
 use std::sync::mpsc::Sender;
+
+pub fn tem_espaco_suficiente() -> bool {
+    let disks = Disks::new_with_refreshed_list();
+
+    // Verifica o disco onde o sistema está ou o principal
+    if let Some(disk) = disks.list().first() {
+        let espaco_livre_gb = disk.available_space() / 1024 / 1024 / 1024;
+        return espaco_livre_gb >= 10; // 10gb como margem de segurança
+    }
+    true 
+}
 
 pub fn is_ollama_installed() -> bool {
     Command::new("ollama")
@@ -60,6 +76,12 @@ pub fn start_ollama_serve() {
 // ============================================
 #[cfg(target_os = "windows")]
 pub fn instalar_ollama() -> Result<(), String> {
+    if !tem_espaco_suficiente() {
+        return Err("Espaço insuficiente. Libere pelo menos 10GB e reinicie o RustOps.".to_string());
+    }
+
+    const CREATE_NO_WINDOW: u32 = 0x08000000;
+    
     let script_powershell = "
         $Url = 'https://ollama.com/download/OllamaSetup.exe'
         $Path = \"$env:TEMP\\OllamaSetup.exe\"
@@ -67,26 +89,31 @@ pub fn instalar_ollama() -> Result<(), String> {
         Start-Process -FilePath $Path -Wait -NoNewWindow
     ";
 
-    let status = Command::new("powershell")
-        .args(["-Command", script_powershell])
-        .status()
-        .map_err(|e| format!("Falha ao executar o PowerShell: {}", e))?;
-    
+    let mut cmd = Command::new("powershell");
+    cmd.args(["-NoProfile", "-NonInteractive", "-Command", script_powershell]);
+    cmd.creation_flags(CREATE_NO_WINDOW);
+
+    let status = cmd.status().map_err(|e| e.to_string())?;
+
     if status.success() {
         Ok(())
     } else {
-        Err("Usuário cancelou a instalação o processo falhou.".to_string())
+        Err("Instalação falhou".to_string())
     }
 }
 
 #[cfg(target_os = "windows")]
 pub fn start_ollama_serve() {
-    // No Windows rodamos o processo em segundo plano invisível
-    let _ = Command::new("ollama")
-        .arg("serve")
+    if ollama_is_running() { return; }
+
+    let mut cmd = Command::new("ollama");
+    cmd.arg("serve")
         .stdout(Stdio::null())
-        .stderr(Stdio::null())
-        .spawn();
+        .stderr(Stdio::null());
+
+    cmd.creation_flags(0x08000000);
+    
+    let _ = cmd.spawn();
     thread::sleep(Duration::from_secs(3));
 }
 
