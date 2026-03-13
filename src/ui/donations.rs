@@ -1,4 +1,3 @@
-// Resposável APENAS pelo carregamento da janela de apoio
 use eframe::egui;
 use crate::app::RustOpsApp;
 
@@ -7,6 +6,14 @@ pub fn desenhar_janela_apoio(app: &mut RustOpsApp, ctx: &egui::Context) {
         if !app.mostrar_janela_apoio {
             return;
         }
+
+        egui::Area::new(egui::Id::new("dimmer"))
+            .interactable(true)
+            .fixed_pos(egui::pos2(0.0, 0.0))
+            .show(ctx, |ui| {
+                let screen_rect = ctx.content_rect();
+                ui.painter().rect_filled(screen_rect, 0.0, egui::Color32::from_black_alpha(150));
+            });
 
         let mut aberta = app.mostrar_janela_apoio;
 

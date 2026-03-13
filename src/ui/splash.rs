@@ -11,14 +11,18 @@ pub fn desenhar_tela_carregamento(app: &mut RustOpsApp, ctx: &egui::Context) -> 
 
     // Verifica se há novas atualizações da thread de setup
     if let Some(rx) = &app.startup_receiver {
-        // Usamos 'while let' para ler todas as mensagens pendentes rapidamente
         while let Ok(msg) = rx.try_recv() {
             if msg == "CONCLUIDO" {
                 app.is_initialized = true;
-                app.startup_receiver = None; // Limpa o canal da memória
                 return false;
             } else if msg.starts_with("ERRO_FATAL") {
-                app.startup_status_text = msg.replace("ERRO_FATAL: ","Erro: ");
+                // 1. Salva o erro no campo criado no app.rs
+                app.erro_fatal = Some(msg.replace("ERRO_FATAL: ", ""));
+
+                // 2. IMPORTANTE: Marcar como inicializado para sair da tela splash
+                // Assim o painel central aparece e a Modal de erro pode ser desenhada por cima.
+                app.is_initialized = true;
+                return false;
             } else {
                 app.startup_status_text = msg;
             }

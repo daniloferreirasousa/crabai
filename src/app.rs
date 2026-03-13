@@ -40,6 +40,9 @@ pub struct RustOpsApp {
     pub sys: System,
     pub cpu_usage: f32,
     pub ram_usage: f32, // em GB
+
+    // Para exibir a mensagem do RustOpsError
+    pub erro_fatal: Option<String>,
 }
 
 // =========================================================
@@ -52,7 +55,7 @@ impl RustOpsApp {
 
         thread::spawn(move || {
             // Closure imediata para facilitar o tratamento de erros com '?'
-            let setup_result = (|| -> Result<(), RustOpsError> {
+            let setup_result = (|| -> Result<(), RustOpsError> {               
                 let _ = tx.send("Verificando motod de IA...".to_string());
                 if !utils::is_ollama_installed() {
                     let _ = tx.send("Instalando Ollama...".to_string());
@@ -121,6 +124,7 @@ impl RustOpsApp {
             sys,
             cpu_usage: 0.0,
             ram_usage: 0.0,
+            erro_fatal: None,
         }
     }
 }
@@ -154,5 +158,6 @@ impl eframe::App for RustOpsApp {
 
         // 4. JANELAS FLUTUANTES (Modais)
         ui::donations::desenhar_janela_apoio(self, ctx);
+        ui::modals::exibir_erros_criticos(self, ctx);
     }
 }

@@ -20,7 +20,7 @@ pub fn tem_espaco_suficiente() -> bool {
         let espaco_livre_gb = disk.available_space() / 1024 / 1024 / 1024;
         return espaco_livre_gb >= 10; // 10gb como margem de segurança
     }
-    true 
+    true
 }
 
 pub fn is_ollama_installed() -> bool {

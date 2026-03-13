@@ -8,3 +8,4 @@ pub mod terms;
 pub mod update_alert;
 pub mod donations;
 pub mod messages;
+pub mod modals;
