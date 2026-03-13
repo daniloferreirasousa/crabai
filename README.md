@@ -8,35 +8,29 @@
 * **Ambiente Livre de Filtros Corporativos:** IAs comerciais frequentemente bloqueiam prompts legítimos de cibersegurança e análise de código. O RustOps utiliza um modelo local focado em engenharia, garantindo que suas pesquisas teóricas de *Red Teaming* não sejam interrompidas.
 * **Zero Configuração:** Esqueça tutoriais complexos envolvendo Python ou Docker. O aplicativo é independente e gerencia sua própria infraestrutura em background com apenas um clique.
 
-### 🚀 Novidades na v0.1.5
-* **Modularização da UI:** Descentralização da lógica de interface para módulos específicos, melhorando a manutenibilidade.
-* **Monitor de Hardware:** Widget no rodapé exibindo consumo de CPU e RAM em tempo real via `sysinfo`.
-* **Isolamento de Estado:** Gerenciamento de estado por sessão, com canais de comunicação dedicados e isolados.
-* **Desacoplamento de Lógica:** Banco de dados refatorado para o padrão `impl AppDatabase` no `storage.rs`.
-* **Input Multiline:** Campo de entrada otimizado para múltiplas linhas com foco ajustado.
-* **Donation 2.0:** Botão de apoio ao projeto reposicionado estrategicamente no rodapé.
-
 ### ✨ Funcionalidades Atuais
 
-* **Monitoramento:** Exibição de recursos de hardware em tempo real.
-* **Gerenciamento de Sessões:** Criação, alternância e persistência local de conversas.
-* **Streaming de IA:** Efeito "máquina de escrever" e renderização de Markdown.
-* **Automação:** Instalação e gestão do serviço Ollama transparente (Zero-Touch).
-* **Interface:** Construída com `eframe`/`egui` para renderização nativa leve.
+* **Automação Zero-Touch:** Instalação e gestão do serviço Ollama totalmente transparentes (Idempotente), com fallback de rede e verificação de requisitos (espaço em disco, permissões).
+* **Tratamento de Erros Resiliente:** Modais visuais amigáveis que guiam o usuário em caso de falhas críticas de ambiente.
+* **Monitoramento Integrado:** Exibição de recursos de hardware (CPU/RAM) em tempo real no rodapé.
+* **Gerenciamento de Sessões:** Criação, alternância e persistência local de múltiplas conversas com banco de dados desacoplado.
+* **Streaming e Markdown:** Efeito "máquina de escrever" em tempo real, suporte total a Markdown com *syntax highlighting* e renderização nativa de Emojis.
+* **Atualizador Automático:** Verificação inteligente de novas versões via GitHub API, notificando o usuário diretamente na interface.
 
 ### 🗂️ Arquitetura do Projeto
 
-O projeto segue os rígidos princípios de *Separation of Concerns*:
+O projeto segue rígidos princípios de *Separation of Concerns* e modularização:
 
-```Text
+```text
 rustops_gui/
 ├── Cargo.toml          # Gerenciamento de dependências
+├── assets/             # Recursos estáticos (Fontes, Imagens)
 └── src/
-    ├── main.rs         # Entry point: Gerencia a janela e o loop do egui.
+    ├── main.rs         # Entry point: Gerencia a janela, loop do egui e fontes.
     ├── app.rs          # Estado central e lógica principal da aplicação.
     ├── storage.rs      # Persistência de dados e gestão de sessões.
-    ├── ollama.rs       # Cliente de comunicação com a API da IA.
-    ├── utils.rs        # Utilitários de sistema e automação.
+    ├── errors.rs       # Sistema centralizado de tratamento de erros customizados.
+    ├── utils.rs        # Utilitários de sistema, hardware checks e automação.
     ├── system_stats.rs # Lógica de monitoramento de hardware.
     └── ui/             # Módulos de interface (componentes e widgets):
         ├── mod.rs      # Exportação dos módulos de UI.
@@ -48,6 +42,7 @@ rustops_gui/
         ├── settings.rs # Configurações da aplicação.
         ├── messages.rs # Lógica de renderização de mensagens.
         ├── donations.rs# Lógica da tela de apoio ao projeto.
+        ├── modals.rs   # Janelas flutuantes e modais de erro crítico.
         └── update_alert.rs # Notificações de atualização.
 ```
 ### 🚀 Como Executar e Distribuir
@@ -66,33 +61,35 @@ Para Distribuir no Windows (Cross-Compile):
 cargo build --target x86_64-pc-windows-gnu --release
 ```
 ### 🗺️ Roadmap (Evolução do Projeto)
-- [x] Streaming de texto em tempo real (Canais MPSC).
+### ✅ Concluído (Core & Estabilidade)
 
-- [x] Memória de contexto (Histórico de sessão).
+- [x] Automação Multiplataforma (Zero-Touch Setup) e Resiliência de Instalação.
 
-- [x] Persistência de Dados (Salvar conversas localmente).
+- [x] Persistência de Dados (Histórico e Sessões Múltiplas).
 
-- [x] Múltiplos Chats: Gerenciamento no painel lateral.
+- [x] Streaming de texto em tempo real (MPSC) e Renderização Markdown.
 
-- [x] Automação Multiplataforma (Zero-Touch Setup).
+- [x] Tratamento de Erros Centralizado (RustOpsError) com Modais de UI.
 
-- [x] Verificador de Atualizações via GitHub API.
+- [x] Atualizador Automático via GitHub API.
 
-- [x] Renderização de Markdown com syntax highlighting.
+- [x] Suporte a Emojis (NotoEmoji fallback).
 
-- [x] Migração para Dolphin 3.0 Llama 3.1 (8B) para maior precisão lógica.
+- [x] Monitor de Hardware Integrado (CPU/RAM).
 
-- [x] **Modularização da UI:** Descentralização do `app.rs` em módulos específicos.
+- [x] Migração para Dolphin 3.0 / Llama 3.1 (8B).
 
-- [x] **Monitor de Hardware:** Widget no rodapé exibindo consumo de CPU/RAM em tempo real (via `sysinfo`).
+### 🔜 Próximos Passos (Backlog)
 
-- [x] **Isolamento de Estado:** Mover `is_processing` para o struct de cada sessão e canal de comunicação por sessão.
+- [ ] **Persistência de Logs**: Gravar erros críticos em arquivo de log local para auditoria e suporte.
 
-- [x] **Desacoplamento de Lógica:** Mover funções de banco de dados para dentro do `impl AppDatabase` no `storage.rs`.
+- [ ] **Seletor de Modelos**: Interface para escolha de diferentes modelos do Ollama (ex: llama3, mistral).
 
-- [x] **Input Multiline:** Trocar o `TextEdit::singleline` pelo `TextEdit::multiline` no rodapé (se necessário ajustar responsividade).
+- [ ] **Internacionalização (i18n)**: Sistema de tradução dinâmica para suporte a múltiplos idiomas.
 
-- [x] **Donation 2.0 (Apoie o Projeto):** Migrar o botão de doações para um local estratégico e visível (colocado no footer ao lado dos status).
+- [ ] **Exportação de Relatórios**: Gerar arquivos .md formatados a partir do histórico de conversas.
+
+- [ ] **Busca Global**: Sistema de indexação simples para busca de texto em todas as sessões gravadas.
 
 ### 📄 Licença
 Este projeto está licenciado sob a GNU General Public License v3.0 (GPLv3). Software livre e de código aberto. Consulte o arquivo [LICENSE] para detalhes.
