@@ -135,7 +135,7 @@ pub fn instalar_ollama() -> Result<(), CrabAIError> {
     if status.success() {
         Ok(())
     } else {
-        Err(CrabAIError::CommandExecution("Falha na instalação.".to_string()).log_err())
+        Err(CrabAIError::CommandExecution("Falha na instalação.".to_string()).log_error())
     }
 }
 
