@@ -1,6 +1,6 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-/* * Projeto: RustOps GUI
+/* * Projeto: CrabAI GUI
  * Autor: Danilo Ferreira Sousa
  * Descrição: Interface gráfica independente para rodar e interagir com modelos locais.
  */
@@ -13,8 +13,10 @@ pub mod ui;
 mod system_stats;
 mod errors;
 
-use app::RustOpsApp;
+use app::CrabAIApp;
 use eframe::egui;
+use simplelog::*;
+use std::fs::File;
 
 // Função para carregar os pixels da imagem durante a compilação
 fn carregar_icone() -> egui::IconData {
@@ -33,7 +35,29 @@ fn carregar_icone() -> egui::IconData {
     }
 }
 
+
+fn iniciar_logger() {
+    let log_file = File::create("crabai.log").expect("Falha ao criar arquivo de log.");
+
+
+    CombinedLogger::init(vec![
+        TermLogger::new(
+            LevelFilter::Info,
+            Config::default(),
+            TerminalMode::Mixed,
+            ColorChoice::Auto
+        ),
+        WriteLogger::new(
+            LevelFilter::Warn,
+            Config::default(),
+            log_file
+        ),
+    ]).unwrap();
+}
+
 fn main() -> eframe::Result<()> {
+    iniciar_logger();
+    
     println!("=== INICIANDO INTERFACE GRÁFICA ===");
 
     let mut options = eframe::NativeOptions::default();
@@ -42,12 +66,14 @@ fn main() -> eframe::Result<()> {
         .with_icon(carregar_icone());
 
     eframe::run_native(
-        "RustOps GUI - Ferramenta de IA Red Team",
+        "CrabAI - Ferramenta de IA Local",
         options,
         Box::new(|cc| {
+            egui_extras::install_image_loaders(&cc.egui_ctx);
+            
             utils::configurar_fontes(&cc.egui_ctx);
 
-            Ok(Box::new(RustOpsApp::new()))
+            Ok(Box::new(CrabAIApp::new()))
         }),
     )
 }

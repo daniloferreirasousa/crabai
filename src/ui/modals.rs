@@ -1,7 +1,7 @@
 use eframe::egui;
-use crate::RustOpsApp;
+use crate::CrabAIApp;
 
-pub fn exibir_erros_criticos(app: &mut RustOpsApp, ctx: &egui::Context) {
+pub fn exibir_erros_criticos(app: &mut CrabAIApp, ctx: &egui::Context) {
     if let Some(msg) = &app.erro_fatal {
         // Criar uma área de "escurecimento" atrás do modal (diming)
         egui::Area::new(egui::Id::new("dimmer"))
@@ -28,7 +28,7 @@ pub fn exibir_erros_criticos(app: &mut RustOpsApp, ctx: &egui::Context) {
                     });
 
                     ui.add_space(10.0);
-                    ui.label("O RustOps não pode continar sem resolver esse problema.");
+                    ui.label("O CrabAI não pode continar sem resolver esse problema.");
                     ui.add_space(10.0);
 
                     if ui.button(egui::RichText::new("  OK  ").strong()).clicked() {

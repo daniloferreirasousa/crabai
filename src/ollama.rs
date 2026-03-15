@@ -14,7 +14,7 @@ pub fn send_to_ollama_chat(history: Vec<ChatMessage>, tx: Sender<String>) {
 
     // Corpo da requisição
     let request_body = serde_json::json!({
-        "model": "rustops",
+        "model": "crabai",
         "messages": history,
         "stream": true
     });

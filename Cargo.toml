@@ -1,5 +1,5 @@
 [package]
-name = "rustops-gui"
+name = "crabai"
 version = "0.1.6"
 edition = "2024"
 license = "GPL-3.0-or-later"
@@ -11,11 +11,15 @@ eframe = "0.33.3" # GUI framework com egui
 reqwest = { version = "0.11", default-features = false, features = ["blocking", "json", "rustls-tls"] }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
-image = "0.24"
 webbrowser = "0.8"
 egui_commonmark = "0.22.0"
 sysinfo = "0.38.4"
 thiserror = "2.0"
+log = "0.4"
+simplelog = "0.12"
+egui_extras = { version = "0.33.3", features = ["image"] }
+image = { version = "0.25", features = ["png", "jpeg"] }
+rfd = "0.14"
 
 [build-dependencies]
 winres = "0.1"
@@ -30,11 +34,11 @@ section = "utility"
 priority = "optional"
 assets = [
     # Copia o executável
-    ["target/release/rustops-gui", "usr/bin/", "755"],
+    ["target/release/crabai", "usr/bin/", "755"],
     # Copia o ícone
-    ["icone.png", "usr/share/pixmaps/rustops.png", "644"],
+    ["icone.png", "usr/share/pixmaps/crabai.png", "644"],
     # NOVO: Copia o atalho para o menu de aplicativos do Linux
-    ["rustops-gui.desktop", "usr/share/applications/", "644"],
+    ["crabai.desktop", "usr/share/applications/", "644"],
 ]
 
 # Injeta as dependências nativas do Windows forçando a feature 'winuser'

@@ -1,7 +1,7 @@
 use eframe::egui;
-use crate::app::RustOpsApp;
+use crate::app::CrabAIApp;
 
-pub fn desenhar_janela_apoio(app: &mut RustOpsApp, ctx: &egui::Context) {
+pub fn desenhar_janela_apoio(app: &mut CrabAIApp, ctx: &egui::Context) {
         // Se for false, nem desenha nada
         if !app.mostrar_janela_apoio {
             return;
@@ -25,7 +25,7 @@ pub fn desenhar_janela_apoio(app: &mut RustOpsApp, ctx: &egui::Context) {
             .show(ctx, |ui|{
                 ui.vertical_centered(|ui| {
                     ui.add_space(10.0);
-                    ui.label("Gostou do RustOps? Ele é gratuito e open-source!");
+                    ui.label("Gostou do CrabAI? Ele é gratuito e open-source!");
                     ui.label("Considere me pagar um café para ajudar a manter o projeto.");
                     ui.add_space(20.0);
 
@@ -35,7 +35,7 @@ pub fn desenhar_janela_apoio(app: &mut RustOpsApp, ctx: &egui::Context) {
                         ui.ctx().copy_text(chave_pix.to_string());
                     }
                     ui.add_space(10.0);
-                    ui.label(egui::RichText::new("Danilo Ferreira Sousa").small().color(egui::Color32::GRAY));
+                    ui.label(egui::RichText::new("Danilo Ferreira Sousa").color(egui::Color32::GRAY));
                     ui.add_space(10.0);
                 });
             });

@@ -1,95 +1,79 @@
-# RustOps GUI - Ferramenta Educacional de Red Team com IA Local
+# 🦀 CrabAI - Mentor de Red Team & Segurança com IA Local
 
-**RustOps GUI** é uma interface gráfica nativa, rápida e independente desenvolvida em Rust para interagir com modelos de linguagem locais via Ollama. O foco do projeto é fornecer uma experiência "plug and play", gerenciando as suas próprias dependências de infraestrutura de forma invisível para o usuário final, operando 100% offline e com alta performance. Esta ferramenta foi desenhada estritamente para fins educacionais e de pesquisa em Segurança da Informação.
+**CrabAI** é uma interface nativa, ultraveloz e independente desenvolvida em **Rust** para interação com modelos de linguagem locais via Ollama. O foco é fornecer uma experiência "plug and play", operando 100% offline para garantir que suas pesquisas de Segurança da Informação permaneçam privadas e sob seu total controle.
 
-### 🛡️ Por que escolher o RustOps?
+> **⚠️ Aviso:** Esta ferramenta foi desenhada estritamente para fins educacionais e de pesquisa em Segurança da Informação (Red Teaming).
 
-* **Privacidade Absoluta (100% Offline):** Seus dados, seus prompts e seus relatórios nunca saem da sua máquina. Não há telemetria, não há assinaturas mensais e nenhum dado é enviado para a nuvem.
-* **Ambiente Livre de Filtros Corporativos:** IAs comerciais frequentemente bloqueiam prompts legítimos de cibersegurança e análise de código. O RustOps utiliza um modelo local focado em engenharia, garantindo que suas pesquisas teóricas de *Red Teaming* não sejam interrompidas.
-* **Zero Configuração:** Esqueça tutoriais complexos envolvendo Python ou Docker. O aplicativo é independente e gerencia sua própria infraestrutura em background com apenas um clique.
+---
 
-### ✨ Funcionalidades Atuais
+### 🖥️ Prévia da Interface
 
-* **Automação Zero-Touch:** Instalação e gestão do serviço Ollama totalmente transparentes (Idempotente), com fallback de rede e verificação de requisitos (espaço em disco, permissões).
-* **Tratamento de Erros Resiliente:** Modais visuais amigáveis que guiam o usuário em caso de falhas críticas de ambiente.
-* **Monitoramento Integrado:** Exibição de recursos de hardware (CPU/RAM) em tempo real no rodapé.
-* **Gerenciamento de Sessões:** Criação, alternância e persistência local de múltiplas conversas com banco de dados desacoplado.
-* **Streaming e Markdown:** Efeito "máquina de escrever" em tempo real, suporte total a Markdown com *syntax highlighting* e renderização nativa de Emojis.
-* **Atualizador Automático:** Verificação inteligente de novas versões via GitHub API, notificando o usuário diretamente na interface.
+![CrabAI Chat Interface](assets/interface01.png)
+![CrabAI Chat Interface](assets/interface02.png)
+![CrabAI Chat Interface](assets/interface03.png)
 
-### 🗂️ Arquitetura do Projeto
 
-O projeto segue rígidos princípios de *Separation of Concerns* e modularização:
+
+### 🛡️ Por que escolher o CrabAI?
+
+* **Privacidade Blindada (100% Offline):** Seus prompts e relatórios nunca saem da sua máquina. Zero telemetria, zero nuvem.
+* **Sem Filtros Corporativos:** Diferente de IAs comerciais, o CrabAI permite pesquisas teóricas de segurança, análise de vulnerabilidades e scripts sem censura de termos técnicos.
+* **Performance Rust:** Executável único e leve. Gerencia sua própria infraestrutura de IA de forma invisível para o usuário final.
+
+### ✨ Funcionalidades em Destaque
+
+* **📥 Exportação de Relatórios:** Gere arquivos `.md` profissionais das suas sessões com um clique para documentação de *pentest*.
+* **🚀 Zero Configuração:** Instalação e gestão do serviço Ollama totalmente automáticas e resilientes.
+* **💾 Persistência Inteligente:** Histórico de mensagens salvo localmente em banco de dados JSON leve e organizado por sessões.
+* **🖥️ Monitoramento em Tempo Real:** Visualização de consumo de CPU/RAM diretamente na interface.
+* **🎨 UI Premium:** Suporte total a Markdown, *syntax highlighting* para código e interface *Dark Mode* otimizada para produtividade.
+
+---
+
+### 🚀 Como Baixar e Utilizar
+
+Para garantir a melhor experiência, suporte e binários otimizados para Windows e Linux, as versões oficiais prontas para uso estão disponíveis no Gumroad:
+
+👉 [**BAIXAR CRABAI NO GUMROAD**](https://daniloflare77.gumroad.com/l/CrabAI)
+
+
+### 🗂️ Arquitetura do Sistema
 
 ```text
-rustops_gui/
-├── Cargo.toml          # Gerenciamento de dependências
-├── assets/             # Recursos estáticos (Fontes, Imagens)
-└── src/
-    ├── main.rs         # Entry point: Gerencia a janela, loop do egui e fontes.
-    ├── app.rs          # Estado central e lógica principal da aplicação.
-    ├── storage.rs      # Persistência de dados e gestão de sessões.
-    ├── errors.rs       # Sistema centralizado de tratamento de erros customizados.
-    ├── utils.rs        # Utilitários de sistema, hardware checks e automação.
-    ├── system_stats.rs # Lógica de monitoramento de hardware.
-    └── ui/             # Módulos de interface (componentes e widgets):
-        ├── mod.rs      # Exportação dos módulos de UI.
-        ├── chat.rs     # Renderização da área de chat.
-        ├── sidebar.rs  # Painel de gerenciamento de conversas.
-        ├── footer.rs   # Rodapé (status, doações e controles).
-        ├── splash.rs   # Tela de carregamento inicial.
-        ├── terms.rs    # Exibição dos termos de uso.
-        ├── settings.rs # Configurações da aplicação.
-        ├── messages.rs # Lógica de renderização de mensagens.
-        ├── donations.rs# Lógica da tela de apoio ao projeto.
-        ├── modals.rs   # Janelas flutuantes e modais de erro crítico.
-        └── update_alert.rs # Notificações de atualização.
+src/
+├── main.rs          # Entry point: Gerencia janela, loop egui e fontes.
+├── app.rs           # Estado central e lógica principal da aplicação (CrabAIApp).
+├── storage.rs       # Persistência de dados e gestão de sessões JSON.
+├── ollama.rs        # Integração e automação do serviço de IA local.
+├── errors.rs        # Sistema centralizado de tratamento de erros.
+├── system_stats.rs  # Lógica de monitoramento de hardware (CPU/RAM).
+├── utils.rs         # Utilitários de sistema e automação de ambiente.
+└── ui/              # Módulos de interface (egui):
+    ├── mod.rs       # Exportação dos módulos de UI.
+    ├── chat.rs      # Renderização do chat e exportação Markdown.
+    ├── sidebar.rs   # Painel de gerenciamento de conversas.
+    ├── footer.rs    # Rodapé com status e monitor de hardware.
+    ├── terms.rs     # Modal de aviso legal e termos de uso.
+    ├── splash.rs    # Tela de carregamento inicial.
+    ├── settings.rs  # Configurações da aplicação.
+    ├── messages.rs  # Lógica de renderização de bolhas de texto.
+    ├── modals.rs    # Janelas flutuantes e alertas críticos.
+    ├── donations.rs # Tela de apoio ao desenvolvedor.
+    └── update_alert.rs # Notificações de atualização.
 ```
-### 🚀 Como Executar e Distribuir
 
-#### Para Desenvolver (Modo Debug):
+### 🗺️ Roadmap de Evolução
+- [x] Exportação de Relatórios: Geração de arquivos Markdown nativa.
 
-```Bash
-cargo run
-```
-#### Para Distribuir no Linux (Gerar Instalador .deb):
-```Bash
-cargo deb
-```
-Para Distribuir no Windows (Cross-Compile):
-```Bash
-cargo build --target x86_64-pc-windows-gnu --release
-```
-### 🗺️ Roadmap (Evolução do Projeto)
-### ✅ Concluído (Core & Estabilidade)
+- [x] Termos de Uso: Sistema de segurança legal integrado ao primeiro acesso.
 
-- [x] Automação Multiplataforma (Zero-Touch Setup) e Resiliência de Instalação.
+- [x] Ícone Nativo: Executável profissional com ícone integrado para Windows.
 
-- [x] Persistência de Dados (Histórico e Sessões Múltiplas).
+- [ ] Seletor de Modelos: Interface para alternar entre diferentes LLMs (Llama, Mistral, etc).
 
-- [x] Streaming de texto em tempo real (MPSC) e Renderização Markdown.
+- [ ] Busca Global: Sistema de indexação para busca de texto em todas as sessões.
 
-- [x] Tratamento de Erros Centralizado (RustOpsError) com Modais de UI.
-
-- [x] Atualizador Automático via GitHub API.
-
-- [x] Suporte a Emojis (NotoEmoji fallback).
-
-- [x] Monitor de Hardware Integrado (CPU/RAM).
-
-- [x] Migração para Dolphin 3.0 / Llama 3.1 (8B).
-
-### 🔜 Próximos Passos (Backlog)
-
-- [ ] **Persistência de Logs**: Gravar erros críticos em arquivo de log local para auditoria e suporte.
-
-- [ ] **Seletor de Modelos**: Interface para escolha de diferentes modelos do Ollama (ex: llama3, mistral).
-
-- [ ] **Internacionalização (i18n)**: Sistema de tradução dinâmica para suporte a múltiplos idiomas.
-
-- [ ] **Exportação de Relatórios**: Gerar arquivos .md formatados a partir do histórico de conversas.
-
-- [ ] **Busca Global**: Sistema de indexação simples para busca de texto em todas as sessões gravadas.
+- [ ] Internacionalização (i18n): Suporte a múltiplos idiomas.
 
 ### 📄 Licença
 Este projeto está licenciado sob a GNU General Public License v3.0 (GPLv3). Software livre e de código aberto. Consulte o arquivo [LICENSE] para detalhes.
@@ -112,4 +96,4 @@ Se curtiu o projeto, ele é gratuito e open-source! Considere me pagar um café 
 
 ---
 
-Desenvolvido por Danilo Ferreira Sousa.
+_Desenvolvido por: **Danilo Ferreira Sousa**_

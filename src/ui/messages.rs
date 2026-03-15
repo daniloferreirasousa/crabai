@@ -1,7 +1,7 @@
 use eframe::egui;
-use crate::app::RustOpsApp;
+use crate::app::CrabAIApp;
 
-pub fn processar_mensagens_ia(app: &mut RustOpsApp, ctx: &egui::Context) {
+pub fn processar_mensagens_ia(app: &mut CrabAIApp, ctx: &egui::Context) {
     let mut precisa_salvar = false;
     
     // Percorre todas as sessões existentes

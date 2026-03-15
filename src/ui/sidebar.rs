@@ -1,8 +1,8 @@
 // Renderiza APENAS o painel lateral (lista de chats)
 use eframe::egui;
-use crate::app::RustOpsApp;
+use crate::app::CrabAIApp;
 
-pub fn desenhar_painel_lateral(app: &mut RustOpsApp, ctx: &egui::Context) {
+pub fn desenhar_painel_lateral(app: &mut CrabAIApp, ctx: &egui::Context) {
     egui::SidePanel::left("menu_lateral")
         .resizable(true)
         .default_width(200.0)

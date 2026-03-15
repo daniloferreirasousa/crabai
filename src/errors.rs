@@ -1,7 +1,8 @@
 use thiserror::Error;
+use log::error;
 
 #[derive(Error, Debug)]
-pub enum RustOpsError {
+pub enum CrabAIError {
     
     #[error("Ollama não está rodando.")]
     OllamaNotRunning,
@@ -26,4 +27,11 @@ pub enum RustOpsError {
 
     #[error("Erro inisperado: {0}")]
     Generic(String),
+}
+
+impl CrabAIError {
+    pub fn log_error(self) -> Self {
+        error!("[SISTEMA {}]", self);
+        self
+    }
 }

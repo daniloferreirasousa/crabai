@@ -1,11 +1,11 @@
 use eframe::egui;
-use crate::app::RustOpsApp;
+use crate::app::CrabAIApp;
 use crate::storage::ChatMessage;
 use std::sync::mpsc::channel;
 use std::thread;
 use crate::ollama;
 
-pub fn desenhar_rodape(app: &mut RustOpsApp, ctx: &egui::Context) {
+pub fn desenhar_rodape(app: &mut CrabAIApp, ctx: &egui::Context) {
     egui::TopBottomPanel::bottom("rodape").show(ctx, |ui| {
         ui.add_space(10.0);
 
@@ -22,7 +22,7 @@ pub fn desenhar_rodape(app: &mut RustOpsApp, ctx: &egui::Context) {
                 .show(ui, |ui| {
                     let response = ui.add(
                         egui::TextEdit::multiline(&mut app.user_input)
-                            .hint_text("Insira um comando para o RustOps")
+                            .hint_text("Insira um comando para o CrabAI")
                             .desired_width(largura_disponivel)
                             .desired_rows(2)
                             .lock_focus(true)
@@ -80,26 +80,14 @@ pub fn desenhar_rodape(app: &mut RustOpsApp, ctx: &egui::Context) {
         ui.add_space(4.0);
 
         ui.horizontal(|ui| {
-            
-            let button_frame = egui::Frame::new()
-                .fill(egui::Color32::from_rgb(80, 180, 80))
-                .corner_radius(4.0)
-                .inner_margin(egui::Margin::symmetric(10, 5));
 
-            let response = button_frame.show(ui, |ui| {
-                ui.label(egui::RichText::new("☕ Apoie o Projeto")
-                    .color(egui::Color32::BLACK)
-                    .strong()
-                )
-            })
-            .response
-            .interact(egui::Sense::click());
+            let cor_laranja = egui::Color32::from_rgb(255, 87, 34);
 
-            if response.hovered() {
-                ui.ctx().set_cursor_icon(egui::CursorIcon::PointingHand);
-            }
+            let botao_apoio = egui::Button::new(egui::RichText::new("☕ Apoie o Projeto").color(cor_laranja))
+                .fill(egui::Color32::TRANSPARENT)
+                .stroke(egui::Stroke::new(1.0, cor_laranja));
 
-            if response.clicked() {
+            if ui.add(botao_apoio).clicked() {
                 app.mostrar_janela_apoio = true;
             }
 

@@ -3,13 +3,14 @@ use std::sync::mpsc::{channel, Receiver};
 use std::thread;
 use egui_commonmark::{CommonMarkCache};
 use sysinfo::System;
+use log::{info, warn, error};
 
 use crate::storage::{AppDatabase};
 use crate::utils;
 use crate::ui;
-use crate::errors::RustOpsError;
+use crate::errors::CrabAIError;
 
-pub struct RustOpsApp {
+pub struct CrabAIApp {
     pub user_input: String,
     pub db: AppDatabase,
     
@@ -21,9 +22,6 @@ pub struct RustOpsApp {
     pub is_initialized: bool,
     pub startup_receiver: Option<Receiver<String>>,
     pub startup_status_text: String,
-
-    // Aceite do termos de usu (novo a cada reinicialização do sistema)
-    pub aceitou_termos: bool,
 
     // Variaveis para o atualizador:
     pub receptor_update: Option<Receiver<String>>,
@@ -41,21 +39,21 @@ pub struct RustOpsApp {
     pub cpu_usage: f32,
     pub ram_usage: f32, // em GB
 
-    // Para exibir a mensagem do RustOpsError
+    // Para exibir a mensagem do CrabAIError
     pub erro_fatal: Option<String>,
 }
 
 // =========================================================
 // INICIALIZAÇÃO E THREAD DE CARREGAMENTO
 // =========================================================
-impl RustOpsApp {
+impl CrabAIApp {
     pub fn new() -> Self {
         let (tx, rx) = channel::<String>();
         let (tx_update, rx_update) = channel::<String>();
 
         thread::spawn(move || {
             // Closure imediata para facilitar o tratamento de erros com '?'
-            let setup_result = (|| -> Result<(), RustOpsError> {
+            let setup_result = (|| -> Result<(), CrabAIError> {
                 
                 let _ = tx.send("Verificando motod de IA...".to_string());
                 if !utils::is_ollama_installed() {
@@ -67,7 +65,7 @@ impl RustOpsApp {
                 if !utils::ollama_is_running() {
                     utils::start_ollama_serve();
                     if !utils::wait_for_ollama_ready(60) {
-                        return Err(RustOpsError::Generic("O motor de IA não respondeu a tempo.".to_string()));
+                        return Err(CrabAIError::Generic("O motor de IA não respondeu a tempo.".to_string()).log_error());
                     }
                 }
 
@@ -77,8 +75,10 @@ impl RustOpsApp {
             })();
 
             if let Err(e) = setup_result {
+                error!("Falha crítica durante a inicialização do motor: {}", e);
                 let _ = tx.send(format!("ERRO_FATAL: {}", e));
             } else {
+                info!("Motor de IA inicializado com sucesso!");
                 let _ = tx.send("CONCLUIDO".to_string());
             }
         });
@@ -89,7 +89,7 @@ impl RustOpsApp {
             let url = "https://api.github.com/repos/daniloferreirasousa/rustops-gui/releases/latest";
 
             let client = reqwest::blocking::Client::builder()
-                .user_agent("RustOps-App")
+                .user_agent("CrabAI-App")
                 .build()
                 .unwrap();
 
@@ -101,7 +101,11 @@ impl RustOpsApp {
                             let _ = tx_update.send(tag.to_string());
                         }
                     }
+                } else {
+                    warn!("Não foi possíve conectar à API do GitHub para buscar atualizações.");
                 }
+            } else {
+                warn!("Não foi possível conectar à API do GitHub para buscar atualizações.");
             }
         });
 
@@ -115,8 +119,7 @@ impl RustOpsApp {
             novo_titulo_temp: String::new(),
             is_initialized: false,
             startup_receiver: Some(rx),
-            startup_status_text: "Iniciando RustOps...".to_string(),
-            aceitou_termos: false,
+            startup_status_text: "Iniciando CrabAI...".to_string(),
             receptor_update: Some(rx_update),
             versao_disponivel: None,
             mostrar_janela_apoio: false,
@@ -134,8 +137,18 @@ impl RustOpsApp {
 // =========================================================
 // O LOOP PRINCIPAL DA INTERFACE (Módulo eframe)
 // =========================================================
-impl eframe::App for RustOpsApp {
+impl eframe::App for CrabAIApp {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
+
+        // 0.0. APLICANDO O TEMA CrabAI
+        let mut style = (*ctx.style()).clone();
+
+        let laranja_crab = egui::Color32::from_rgb(255,87,34);
+
+        style.visuals.selection.bg_fill = laranja_crab;
+        style.visuals.hyperlink_color = laranja_crab;
+
+        ctx.set_style(style);
 
         // 0. DADOS DO PC
         let (cpu, ram) = crate::system_stats::obter_dados_hardware(&mut self.sys);

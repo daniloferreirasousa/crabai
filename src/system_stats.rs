@@ -14,7 +14,7 @@ pub fn obter_dados_hardware(sys: &mut System) -> (f32, f32) {
     };
 
     // Cálculo da RAM: Convertendo de KB para GB
-   let ram_uso = sys.used_memory() as f32 / 1_048_576.0; // KB para GB é 1024 / 1024
+   let ram_uso = sys.used_memory() as f32 / 1_073_741_842.0; // KB para GB é 1024 / 1024
 
    (cpu_uso, ram_uso)
 }

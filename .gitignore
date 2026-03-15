@@ -1,2 +1,3 @@
 /target
-rustops_db.json
+crabai_db.json
+*.log

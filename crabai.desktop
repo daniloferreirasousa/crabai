@@ -1,9 +1,9 @@
 [Desktop Entry]
 Version=1.0
-Name=RustOps
+Name=CrabAI
 Comment=Assistente de IA Local focado em Rust
-Exec=rustops-gui
-Icon=rustops
+Exec=crabai
+Icon=cabrai
 Terminal=false
 Type=Application
 Categories=Utility;Development;

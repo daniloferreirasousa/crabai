@@ -1,7 +1,7 @@
 use eframe::egui;
-use crate::app::RustOpsApp;
+use crate::app::CrabAIApp;
 
-pub fn desenhar_alerta_atualizacao(app: &mut RustOpsApp, ctx: &egui::Context) {
+pub fn desenhar_alerta_atualizacao(app: &mut CrabAIApp, ctx: &egui::Context) {
     // 1. Tenta ler a mensage da thread do Github
     if let Some(rx) = &app.receptor_update {
         if let Ok(nova_versao) = rx.try_recv() {
@@ -16,7 +16,7 @@ pub fn desenhar_alerta_atualizacao(app: &mut RustOpsApp, ctx: &egui::Context) {
             ui.add_space(5.0);
             ui.horizontal(|ui| {
                 ui.label(
-                    egui::RichText::new(format!("🚀 Nova versão do RustOps disponível ({})!", versao))
+                    egui::RichText::new(format!("🚀 Nova versão do CrabAI disponível ({})!", versao))
                         .color(egui::Color32::YELLOW)
                         .strong()
                 );
@@ -25,7 +25,7 @@ pub fn desenhar_alerta_atualizacao(app: &mut RustOpsApp, ctx: &egui::Context) {
                 ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
                     
                     if ui.button("Baixar Atualização").clicked() {
-                        let url_release = "https://github.com/daniloferreirasousa/rustops-gui/releases/latest";
+                        let url_release = "https://github.com/daniloferreirasousa/crabai/releases/latest";
                         let _ = webbrowser::open(url_release);
                     }
                 });

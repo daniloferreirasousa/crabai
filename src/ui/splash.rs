@@ -1,9 +1,9 @@
 // Renderiza APENAS a tela de de carregamento incial
 use eframe::egui;
-use crate::app::RustOpsApp;
+use crate::app::CrabAIApp;
 
 
-pub fn desenhar_tela_carregamento(app: &mut RustOpsApp, ctx: &egui::Context) -> bool {
+pub fn desenhar_tela_carregamento(app: &mut CrabAIApp, ctx: &egui::Context) -> bool {
     // Se já carregou tudo, avisa o update() para desenhar o resto do app
     if app.is_initialized {
         return false;
@@ -33,7 +33,7 @@ pub fn desenhar_tela_carregamento(app: &mut RustOpsApp, ctx: &egui::Context) -> 
     egui::CentralPanel::default().show(ctx, |ui| {
         ui.vertical_centered(|ui| {
             ui.add_space(100.0);
-            ui.heading(egui::RichText::new("🚀 RustOps").size(40.0).strong());
+            ui.heading(egui::RichText::new("🚀 CrabAI").size(45.0).strong());
             ui.add_space(40.0);
             
             // Se for um erro,  não mostra o spinner
