@@ -34,7 +34,11 @@
 
 Para garantir a melhor experiência, suporte e binários otimizados para Windows e Linux, as versões oficiais prontas para uso estão disponíveis no Gumroad:
 
-👉 [**BAIXAR CRABAI NO GUMROAD**](https://daniloflare77.gumroad.com/l/CrabAI)
+_Não é necessário pagar para baixar, apenas se quiser contribuir para a sustentação do projeto. Se apenas quiser fazer o download, coloque *0* e irá permitir o download dos instaladores, ai é só selecionar qual distribuição (Linux ou Windows)_
+
+👉 [**BAIXAR CRABAI NO GUMROAD**](https://daniloferreirasousa.gumroad.com/l/CrabAI)
+
+
 
 
 ### 🗂️ Arquitetura do Sistema
